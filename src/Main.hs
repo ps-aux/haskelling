@@ -2,56 +2,51 @@ module Main where
 
 main :: IO ()
 main = do
-    let x = 20
-    let separator = "\n"
-    putStrLn $ leftRightTriangle x
-    putStrLn $ rightRightTriangle x
-    putStrLn $ equilateralTriangle x
-    putStrLn $ square x
-
-shape :: (Int -> Int -> String) -> Int -> String
-shape lvlToString height = loop height 1 ""
-    where loop height lvl acc =
-            if lvl > height
-                then acc
-                else loop height (lvl + 1) (acc  ++ lvlToString height lvl ++ "\n")
+    mapM_ (\s -> putStrLn $ render(s x)) shapes
+    where
+        x = 10
+        shapes = [square, triangle, rightTriangle]
 
 
-leftRightTriangle = shape $ \_ l -> line l
-
-rightRightTriangle = shape $ \h l -> spaceLeftPad (line l) h
-
-square = shape  $ \h _ -> line h
-
-equilateralTriangle = shape equilateralTriangleLvl
-equilateralTriangleLvl height lvl = spaceCenter (line (lvlWidth lvl)) baseWidth
-    where baseWidth =  lvlWidth height
-          lvlWidth l = l * 2 - 1
+-- Render bit map to a string representation
+render :: [[Int]] -> String
+render = concatMap toRow
 
 
-line width = replicate width '*'
+toChar :: Int -> Char
+toChar 1 = 'o'
+toChar 0 = '.'
 
-center :: Char -> String -> Int -> String
-center fillCh str width =
-    if len > width
-        then error "String longer than width"
-        else fill leftPad ++ str ++ fill rightPad
-    where len = length str
-          fill n = replicate n fillCh
-          leftPad = quot (width - len) 2
-          rightPad = width - len - leftPad
+toRow :: [Int] -> [Char]
+toRow [] = ['\n']
+toRow (x:xs) = toChar x:toRow xs
 
-leftPad :: Char -> String -> Int -> String
-leftPad fillCh str width =
-    if len > width
-        then error "String longer than width"
-        else replicate leftPad fillCh ++ str
-    where len = length str
-          leftPad = width - len
+listOf :: a -> Int -> [a]
+listOf a n = take n $ repeat a
 
-spaceCenter = center ' '
-spaceLeftPad = leftPad ' '
+points = listOf 1
+spaces = listOf 0
 
-join :: String -> [String] -> String
-join _ (x:[]) = x
-join s (x:xs) = x ++ s ++ (join s xs)
+
+square :: Int -> [[Int]]
+square = shape squareRow
+
+squareRow :: Int -> Int -> [Int]
+squareRow _ x = points x
+
+
+triangle :: Int -> [[Int]]
+triangle = shape triangleRow
+
+triangleRow :: Int -> Int -> [Int]
+triangleRow row x = points row ++ spaces (x - row)
+
+rightTriangle :: Int -> [[Int]]
+rightTriangle = shape ((reverse .) . triangleRow) -- Compose 3 unary functions (trRow is binary)
+
+
+shape :: (Int -> Int ->  [Int]) -> Int -> [[Int]]
+shape row x = loop (x - 1) where
+    loop (-1) = []
+    loop n = (row (x - n) x) : loop (n - 1)
+
