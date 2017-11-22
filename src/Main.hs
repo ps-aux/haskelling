@@ -1,4 +1,3 @@
-import Foo
 import Shapes
 import Types
 
@@ -9,8 +8,10 @@ main = do
        let p = (Point 1.0 3.0)
            c = Circle p 10.0
            sq = Square p 10.0
+           id = "Idecko"
        putStrLn $ show p
        putStrLn $ show $ area (c)
-       putStrLn $ show $ area (sq)
+       putStrLn $ show $ userDb
+       putStrLn $ show $ foo "123"
 
 
