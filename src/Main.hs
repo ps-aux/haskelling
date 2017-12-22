@@ -16,10 +16,10 @@ printShapes = do
 
 printFile :: IO ()
 printFile = do
-        h <- openFile "file.txt" ReadMode
-        r <- hGetContents h
-        putStrLn r
-        hClose h
+         h <- openFile "file.txt" ReadMode
+         r <- hGetContents h
+         putStrLn r
+         hClose h
 
 
 main :: IO()
